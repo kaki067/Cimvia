@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Política de cookies | Cimvia</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="index.html" aria-label="Inicio">
+          <img class="brand-logo" src="assets/logo.png" alt="Cimvia" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/Logo.png';}else{this.hidden=true;}" />
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span>
+            Cimvia
+            <small>Cookies</small>
+          </span>
+        </a>
+        <nav class="nav" aria-label="Navegación principal">
+          <a href="index.html">Inicio</a>
+          <a href="servicios.html">Servicios</a>
+          <a href="sobre.html">Sobre</a>
+          <a href="contacto.html">Contacto</a>
+          <button class="btn theme-toggle" type="button" data-theme-toggle aria-pressed="false">Oscuro</button>
+          <a class="btn btn-primary" data-auth-link="login" href="login.html">Iniciar sesión</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section class="hero">
+        <div class="container">
+          <h1>Política de cookies</h1>
+          <p>
+            Las cookies son pequeños archivos que se guardan en tu dispositivo para recordar información de navegación
+            (por ejemplo, preferencias). Puedes gestionarlas desde tu navegador.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container grid-2">
+          <div class="callout">
+            <strong>Qué cookies usamos</strong>
+            <p>
+              Actualmente este sitio usa cookies/localStorage para recordar tu elección sobre cookies y, si inicias sesión,
+              mantener la sesión del panel. No usamos cookies de publicidad en esta versión.
+            </p>
+          </div>
+          <div class="callout">
+            <strong>Cómo cambiar tu elección</strong>
+            <p>
+              Puedes borrar los datos del sitio desde tu navegador para que vuelva a aparecer el aviso de cookies.
+              También puedes ir a “Configuración del sitio” en tu navegador y eliminar cookies/almacenamiento.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <h2>Tipos habituales</h2>
+          <p class="lead">A continuación, un resumen común (puede ajustarse si añades analítica o servicios de terceros).</p>
+
+          <div class="cards">
+            <article class="card">
+              <h3>Técnicas</h3>
+              <p>Necesarias para el funcionamiento básico del sitio.</p>
+            </article>
+            <article class="card">
+              <h3>Preferencias</h3>
+              <p>Recuerdan opciones del usuario (idioma, elección de cookies, etc.).</p>
+            </article>
+            <article class="card">
+              <h3>Analítica</h3>
+              <p>Ayudan a medir uso del sitio. Solo se activarían si se añade una herramienta de analítica.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container callout">
+          <strong>Privacidad</strong>
+          <p>
+            Consulta también la
+            <a href="privacidad.html" class="btn" style="margin-left:10px">Política de privacidad</a>.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>© <span id="year"></span> Cimvia</div>
+        <div class="nav" aria-label="Enlaces del pie">
+          <a href="sobre.html">Sobre</a>
+          <a href="servicios.html">Servicios</a>
+          <a href="contacto.html">Contacto</a>
+          <a href="privacidad.html">Privacidad</a>
+          <a href="cookies.html">Cookies</a>
+        </div>
+      </div>
+    </footer>
+
+    <div class="cookie-banner" data-cookie-banner aria-hidden="true">
+      <div class="cookie-inner">
+        <div class="cookie-text">
+          <strong>Cookies</strong>
+          <span>
+            Usamos cookies para recordar preferencias y mejorar la experiencia. Puedes aceptar o rechazar.
+            <a href="cookies.html">Ver política</a>
+          </span>
+        </div>
+        <div class="cookie-actions">
+          <button class="btn" type="button" data-cookie-reject>Rechazar</button>
+          <button class="btn btn-primary" type="button" data-cookie-accept>Aceptar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
+

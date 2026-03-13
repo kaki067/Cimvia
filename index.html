@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cimvia | Proxmox y automatización</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="index.html" aria-label="Inicio">
+          <img class="brand-logo" src="assets/logo.png" alt="Cimvia" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/Logo.png';}else{this.hidden=true;}" />
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span>
+            Cimvia
+            <small>Proxmox • Automatización</small>
+          </span>
+        </a>
+
+        <nav class="nav" aria-label="Navegación principal">
+          <a href="#mi-seccion">Inicio</a>
+          <a href="#automatizacion">Automatización</a>
+          <a href="#optimizacion">Optimización</a>
+          <a href="#servicios">Servicios</a>
+          <button class="btn theme-toggle" type="button" data-theme-toggle aria-pressed="false">Oscuro</button>
+          <a class="btn btn-primary" data-auth-link="login" href="login.html">Iniciar sesión</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <h1 id="mi-seccion">Soluciones inteligentes para la gestión de máquinas virtuales</h1>
+            <p>
+              Automatizamos la creación, configuración y optimización de máquinas virtuales con ayuda de Proxmox
+              para que tu infraestructura funcione de forma más rápida, eficiente y sin complicaciones.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#servicios">Ver servicios</a>
+              <a class="btn" href="contacto.html">Contactar</a>
+            </div>
+          </div>
+
+          <aside class="hero-side" aria-label="Destacado">
+            <div class="media-card" aria-label="Imagen de máquinas virtuales">
+              <img class="media-img" src="assets/Maquinas%20Virtuales.webp" alt="Máquinas virtuales" loading="eager" />
+            </div>
+            <div class="hero-quote" aria-label="Mensaje destacado">
+              <p>
+                «Automatizamos tus máquinas virtuales con la utilización de Proxmox para que tu infraestructura funcione
+                de forma más rápida, eficiente y sin complicaciones.»
+              </p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="automatizacion">
+        <div class="container">
+          <h2>Automatización de entornos virtuales</h2>
+          <p class="lead">
+            Mejora tu despliegue con plantillas, parámetros definidos y flujos repetibles para reducir errores y ahorrar tiempo.
+          </p>
+
+          <div class="cards">
+            <article class="card">
+              <h3>Creación automática de máquinas virtuales</h3>
+              <p>Proxmox permite generar configuraciones personalizadas y crear máquinas virtuales sin intervención manual.</p>
+            </article>
+            <article class="card">
+              <h3>Configuración inteligente del sistema</h3>
+              <p>
+                Asignación de CPU, RAM y almacenamiento según los parámetros definidos, adaptado a cada máquina virtual.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Automatización mediante scripts</h3>
+              <p>Uso de scripts y API para crear, iniciar, detener y configurar máquinas virtuales de forma automática.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="optimizacion">
+        <div class="container">
+          <h2>Monitorización y optimización</h2>
+          <p class="lead">
+            Supervisa el rendimiento en tiempo real y optimiza recursos para mantener estabilidad y eficiencia.
+          </p>
+
+          <div class="cards">
+            <article class="card">
+              <h3>Monitorización</h3>
+              <p>Supervisión del estado de VMs, CPU, RAM, disco y red para detectar problemas a tiempo.</p>
+            </article>
+            <article class="card">
+              <h3>Detección de errores y correcciones</h3>
+              <p>Alertas ante fallos de hardware, problemas de red o incidencias en máquinas virtuales.</p>
+            </article>
+            <article class="card">
+              <h3>Optimización del uso de recursos</h3>
+              <p>
+                Técnicas como alta disponibilidad y migración en caliente para distribuir recursos según la demanda.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container grid-2">
+          <div class="callout">
+            <div class="callout-header">
+              <img class="callout-icon" src="assets/Proxmox.png" alt="Proxmox" loading="lazy" />
+              <strong>Optimización inteligente con Proxmox</strong>
+            </div>
+            <p>
+              Asignación automática de recursos, monitorización desde la interfaz de Proxmox y mayor estabilidad para tus sistemas.
+            </p>
+          </div>
+          <div class="callout">
+            <div class="callout-header">
+              <img class="callout-icon" src="assets/Maquinas%20virtuales%202.png" alt="Máquinas virtuales" loading="lazy" />
+              <strong>Creación rápida de máquinas virtuales</strong>
+            </div>
+            <p>Configuración personalizada según tus necesidades, reducción del tiempo de despliegue y menos errores.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="servicios">
+        <div class="container">
+          <h2>Nuestros servicios / ventajas</h2>
+          <p class="lead">Servicios orientados a resultados: despliegue, seguridad, redes, mantenimiento y recuperación.</p>
+
+          <div class="list">
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Implementación de Proxmox VE</h3>
+                <p>Instalación y puesta en marcha de entornos de virtualización adaptados a cada cliente.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Creación y gestión de VMs y contenedores</h3>
+                <p>Configuración de VMs y contenedores LXC de forma eficiente y segura.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Automatización de entornos virtuales</h3>
+                <p>Despliegue rápido con plantillas, scripts y configuraciones predefinidas.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Configuración de redes virtuales</h3>
+                <p>Diseño de redes internas, VLANs, bridges y firewall dentro de Proxmox.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Monitorización y mantenimiento</h3>
+                <p>Supervisión del rendimiento y estado de los sistemas para garantizar estabilidad.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Copias de seguridad y recuperación</h3>
+                <p>Backups automáticos y restauración ante fallos.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Soporte técnico y administración remota</h3>
+                <p>Gestión y resolución de incidencias en entornos virtualizados.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="login-cta">
+        <div class="container callout">
+          <strong>Inicia sesión para conocer más sobre nosotros</strong>
+          <p>Donde mejor que con tus máquinas virtuales de confianza.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" data-auth-link="login" href="login.html">Iniciar sesión</a>
+            <a class="btn" href="sobre.html">Sobre nosotros</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>© <span id="year"></span> Cimvia</div>
+        <div class="nav" aria-label="Enlaces del pie">
+          <a href="sobre.html">Sobre</a>
+          <a href="servicios.html">Servicios</a>
+          <a href="contacto.html">Contacto</a>
+          <a href="privacidad.html">Privacidad</a>
+          <a href="cookies.html">Cookies</a>
+        </div>
+      </div>
+    </footer>
+
+    <div class="cookie-banner" data-cookie-banner aria-hidden="true">
+      <div class="cookie-inner">
+        <div class="cookie-text">
+          <strong>Cookies</strong>
+          <span>
+            Usamos cookies para recordar preferencias y mejorar la experiencia. Puedes aceptar o rechazar.
+            <a href="cookies.html">Ver política</a>
+          </span>
+        </div>
+        <div class="cookie-actions">
+          <button class="btn" type="button" data-cookie-reject>Rechazar</button>
+          <button class="btn btn-primary" type="button" data-cookie-accept>Aceptar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
+

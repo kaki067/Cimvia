@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Servicios | Cimvia</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="index.html" aria-label="Inicio">
+          <img class="brand-logo" src="assets/logo.png" alt="Cimvia" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/Logo.png';}else{this.hidden=true;}" />
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span>
+            Cimvia
+            <small>Servicios</small>
+          </span>
+        </a>
+        <nav class="nav" aria-label="Navegación principal">
+          <a href="index.html">Inicio</a>
+          <a href="sobre.html">Sobre</a>
+          <a href="contacto.html">Contacto</a>
+          <button class="btn theme-toggle" type="button" data-theme-toggle aria-pressed="false">Oscuro</button>
+          <a class="btn btn-primary" data-auth-link="login" href="login.html">Iniciar sesión</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <h1>Nuestros servicios</h1>
+            <p>
+              Implementamos y optimizamos entornos Proxmox para que puedas desplegar máquinas virtuales y contenedores con
+              seguridad, control y automatización.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="contacto.html">Pedir información</a>
+              <a class="btn" href="index.html#servicios">Volver a inicio</a>
+            </div>
+          </div>
+          <aside class="hero-quote" aria-label="Mensaje destacado">
+            <p>
+              “Máquinas virtuales creadas con ayuda de Proxmox, sin esfuerzo y sin límites. Una nueva forma de automatizar,
+              más rápida, más inteligente y totalmente optimizada.”
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <h2>Servicios / ventajas</h2>
+          <p class="lead">Desde la instalación hasta la operación diaria: redes, backups, monitorización y soporte.</p>
+
+          <div class="list">
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Implementación de Proxmox VE</h3>
+                <p>Instalación y puesta en marcha adaptadas al entorno del cliente.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Creación y gestión de máquinas virtuales y contenedores</h3>
+                <p>Configuración de VMs y contenedores LXC de forma eficiente y segura.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Automatización de entornos virtuales</h3>
+                <p>Plantillas, scripts y flujos repetibles para despliegues rápidos.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Configuración de redes virtuales</h3>
+                <p>VLANs, bridges, firewall y segmentación dentro de Proxmox.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Monitorización y mantenimiento</h3>
+                <p>Supervisión continua del rendimiento y del estado de los servicios.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Copias de seguridad y recuperación</h3>
+                <p>Backups automáticos y restauración rápida ante fallos.</p>
+              </div>
+            </div>
+            <div class="list-item">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <h3>Soporte técnico y administración remota</h3>
+                <p>Gestión y resolución de incidencias en entornos virtualizados.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container callout">
+          <strong>¿Listo para automatizar?</strong>
+          <p>Cuéntanos tu caso y preparamos una propuesta sin cambiar tu forma de trabajo.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="contacto.html">Contactar</a>
+            <a class="btn" data-auth-link="login" href="login.html">Iniciar sesión</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>© <span id="year"></span> Cimvia</div>
+        <div class="nav" aria-label="Enlaces del pie">
+          <a href="sobre.html">Sobre</a>
+          <a href="servicios.html">Servicios</a>
+          <a href="contacto.html">Contacto</a>
+          <a href="privacidad.html">Privacidad</a>
+          <a href="cookies.html">Cookies</a>
+        </div>
+      </div>
+    </footer>
+
+    <div class="cookie-banner" data-cookie-banner aria-hidden="true">
+      <div class="cookie-inner">
+        <div class="cookie-text">
+          <strong>Cookies</strong>
+          <span>
+            Usamos cookies para recordar preferencias y mejorar la experiencia. Puedes aceptar o rechazar.
+            <a href="cookies.html">Ver política</a>
+          </span>
+        </div>
+        <div class="cookie-actions">
+          <button class="btn" type="button" data-cookie-reject>Rechazar</button>
+          <button class="btn btn-primary" type="button" data-cookie-accept>Aceptar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
+
