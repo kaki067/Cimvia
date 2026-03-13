@@ -34,13 +34,24 @@ function getCookieConsent() {
     if (value === "accepted" || value === "rejected") return value;
     return null;
   } catch {
-    return null;
+    try {
+      const value = sessionStorage.getItem(COOKIE_KEY);
+      if (value === "accepted" || value === "rejected") return value;
+      return null;
+    } catch {
+      return null;
+    }
   }
 }
 
 
 function setCookieConsent(value) {
-  localStorage.setItem(COOKIE_KEY, value);
+  try {
+    localStorage.setItem(COOKIE_KEY, value);
+  } catch {}
+  try {
+    sessionStorage.setItem(COOKIE_KEY, value);
+  } catch {}
 }
 
 function storeReturnTo(url) {
