@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acceso bloqueado por cookies | Cimva</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="index.html" aria-label="Inicio">
+          <img class="brand-logo" src="assets/logo.png" alt="Cimva" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/Logo.png';}else{this.hidden=true;}" />
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span>
+            Cimva
+            <small>Cookies</small>
+          </span>
+        </a>
+        <nav class="nav" aria-label="Navegación principal">
+          <a href="cookies.html">Política de cookies</a>
+          <a href="privacidad.html">Privacidad</a>
+          <button class="btn theme-toggle" type="button" data-theme-toggle aria-pressed="false">Oscuro</button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido" class="section">
+      <div class="container">
+        <section class="callout">
+          <strong>Acceso bloqueado</strong>
+          <p>
+            Has rechazado las cookies. Para continuar navegando por el sitio, necesitas aceptarlas.
+            Puedes revisar la información en la política de cookies.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" type="button" data-cookie-accept>Aceptar cookies</button>
+            <a class="btn" href="cookies.html">Ver política</a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>© <span id="year"></span> Cimva</div>
+        <div class="nav" aria-label="Enlaces del pie">
+          <a href="privacidad.html">Privacidad</a>
+          <a href="cookies.html">Cookies</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
+

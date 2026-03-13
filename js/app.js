@@ -1,6 +1,7 @@
 const SESSION_KEY = "cimvia_session_v1";
 const COOKIE_KEY = "cimvia_cookie_consent_v1";
 const THEME_KEY = "cimvia_theme_v1";
+const RETURN_TO_KEY = "cimvia_return_to_v1";
 
 function getSession() {
   try {
@@ -40,6 +41,41 @@ function getCookieConsent() {
 
 function setCookieConsent(value) {
   localStorage.setItem(COOKIE_KEY, value);
+}
+
+function storeReturnTo(url) {
+  try {
+    sessionStorage.setItem(RETURN_TO_KEY, url);
+  } catch {}
+}
+
+function takeReturnTo() {
+  try {
+    const url = sessionStorage.getItem(RETURN_TO_KEY);
+    sessionStorage.removeItem(RETURN_TO_KEY);
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+function isAllowedWhenRejected(pathname) {
+  const allow = new Set(["/cookies.html", "/privacidad.html", "/cookies-bloqueado.html"]);
+  return allow.has(pathname);
+}
+
+function initCookieGate() {
+  const consent = getCookieConsent();
+  if (consent !== "rejected") return;
+
+  const pathname = window.location.pathname.endsWith("/")
+    ? "/index.html"
+    : window.location.pathname;
+
+  if (isAllowedWhenRejected(pathname)) return;
+
+  storeReturnTo(window.location.href);
+  redirectTo("cookies-bloqueado.html");
 }
 
 function getStoredTheme() {
@@ -260,16 +296,30 @@ function initCookieBanner() {
   rejectBtn?.addEventListener("click", () => {
     setCookieConsent("rejected");
     close();
+    storeReturnTo(window.location.href);
+    redirectTo("cookies-bloqueado.html");
+  });
+}
+
+function initCookieBlockedPage() {
+  const acceptBtn = document.querySelector("[data-cookie-accept]");
+  if (!acceptBtn) return;
+  acceptBtn.addEventListener("click", () => {
+    setCookieConsent("accepted");
+    const back = takeReturnTo();
+    redirectTo(back || "index.html");
   });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
+  initCookieGate();
   initSmoothAnchors();
   initLoginForm();
   initContactForm();
   initProtectedPage();
   initAuthLinks();
   initCookieBanner();
+  initCookieBlockedPage();
 });
 
