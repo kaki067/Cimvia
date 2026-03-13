@@ -302,13 +302,17 @@ function initCookieBanner() {
 }
 
 function initCookieBlockedPage() {
-  const acceptBtn = document.querySelector("[data-cookie-accept]");
-  if (!acceptBtn) return;
-  acceptBtn.addEventListener("click", () => {
-    setCookieConsent("accepted");
-    const back = takeReturnTo();
-    redirectTo(back || "index.html");
-  });
+  const isBlockedPage = document.body?.getAttribute("data-cookie-blocked") === "true";
+  if (!isBlockedPage) return;
+
+  const acceptButtons = document.querySelectorAll("[data-cookie-accept]");
+  for (const btn of acceptButtons) {
+    btn.addEventListener("click", () => {
+      setCookieConsent("accepted");
+      const back = takeReturnTo();
+      window.location.href = back || "index.html";
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
