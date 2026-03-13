@@ -37,15 +37,6 @@ function getCookieConsent() {
   }
 }
 
-function checkCookieAccess() {
-  const consent = getCookieConsent();
- 
-  if (consent === "rejected") {
-    window.location.href = "/cookies.html";
-  }
-}
- 
-document.addEventListener("DOMContentLoaded", checkCookieAccess);
 
 function setCookieConsent(value) {
   localStorage.setItem(COOKIE_KEY, value);
