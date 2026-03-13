@@ -2,6 +2,7 @@ const SESSION_KEY = "cimvia_session_v1";
 const COOKIE_KEY = "cimvia_cookie_consent_v1";
 const THEME_KEY = "cimvia_theme_v1";
 const RETURN_TO_KEY = "cimvia_return_to_v1";
+const CONSENT_COOKIE_NAME = "cimva_cookie_consent";
 
 function getSession() {
   try {
@@ -29,6 +30,23 @@ function clearSession() {
 }
 
 function getCookieConsent() {
+  const fromCookie = (() => {
+    try {
+      const parts = document.cookie ? document.cookie.split(";") : [];
+      for (const p of parts) {
+        const [k, ...rest] = p.trim().split("=");
+        if (k === CONSENT_COOKIE_NAME) {
+          const v = decodeURIComponent(rest.join("="));
+          if (v === "accepted" || v === "rejected") return v;
+        }
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  })();
+  if (fromCookie) return fromCookie;
+
   try {
     const value = localStorage.getItem(COOKIE_KEY);
     if (value === "accepted" || value === "rejected") return value;
@@ -46,6 +64,10 @@ function getCookieConsent() {
 
 
 function setCookieConsent(value) {
+  try {
+    const maxAge = 60 * 60 * 24 * 180;
+    document.cookie = `${CONSENT_COOKIE_NAME}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
+  } catch {}
   try {
     localStorage.setItem(COOKIE_KEY, value);
   } catch {}
@@ -71,8 +93,9 @@ function takeReturnTo() {
 }
 
 function isAllowedWhenRejected(pathname) {
-  const allow = new Set(["/cookies.html", "/privacidad.html", "/cookies-bloqueado.html"]);
-  return allow.has(pathname);
+  const allow = ["cookies.html", "privacidad.html", "cookies-bloqueado.html"];
+  const p = (pathname || "").toLowerCase();
+  return allow.some((name) => p.endsWith("/" + name) || p.endsWith("\\" + name) || p.endsWith(name));
 }
 
 function initCookieGate() {
