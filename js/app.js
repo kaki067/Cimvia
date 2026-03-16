@@ -3,6 +3,8 @@ const COOKIE_KEY = "cimvia_cookie_consent_v1";
 const THEME_KEY = "cimvia_theme_v1";
 const RETURN_TO_KEY = "cimvia_return_to_v1";
 const CONSENT_COOKIE_NAME = "cimva_cookie_consent";
+const SUPABASE_URL = "https://cshvfrnougpxhlnvddem.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_aPByjxuEr9nwBGo1ol6j4Q_jEyelpFM";
 
 function getSession() {
   try {
@@ -92,24 +94,29 @@ function takeReturnTo() {
   }
 }
 
-function isAllowedWhenRejected(pathname) {
-  const allow = ["cookies.html", "privacidad.html", "cookies-bloqueado.html"];
-  const p = (pathname || "").toLowerCase();
-  return allow.some((name) => p.endsWith("/" + name) || p.endsWith("\\" + name) || p.endsWith(name));
+function getCurrentFileName() {
+  try {
+    const href = window.location.href.split("#")[0].split("?")[0];
+    const parts = href.split("/");
+    const last = parts[parts.length - 1] || "";
+    if (!last) return "index.html";
+    if (last.includes(":") && last.endsWith("/")) return "index.html";
+    return decodeURIComponent(last).toLowerCase();
+  } catch {
+    return "index.html";
+  }
 }
 
 function initCookieGate() {
   const consent = getCookieConsent();
   if (consent !== "rejected") return;
 
-  const pathname = window.location.pathname.endsWith("/")
-    ? "/index.html"
-    : window.location.pathname;
-
-  if (isAllowedWhenRejected(pathname)) return;
+  const file = getCurrentFileName();
+  const allow = new Set(["cookies.html", "privacidad.html", "cookies-bloqueado.html"]);
+  if (allow.has(file)) return;
 
   storeReturnTo(window.location.href);
-  redirectTo("cookies-bloqueado.html");
+  window.location.replace("cookies-bloqueado.html");
 }
 
 function getStoredTheme() {
@@ -331,7 +338,7 @@ function initCookieBanner() {
     setCookieConsent("rejected");
     close();
     storeReturnTo(window.location.href);
-    redirectTo("cookies-bloqueado.html");
+    window.location.replace("cookies-bloqueado.html");
   });
 }
 
@@ -344,9 +351,127 @@ function initCookieBlockedPage() {
     btn.addEventListener("click", () => {
       setCookieConsent("accepted");
       const back = takeReturnTo();
-      window.location.href = back || "index.html";
+      window.location.replace(back || "index.html");
     });
   }
+}
+
+function initSupabaseDownload() {
+  const form = document.querySelector("[data-supabase-download]");
+  if (!form) return;
+
+  const urlInput = form.querySelector('input[name="sb_url"]');
+  const bucketInput = form.querySelector('input[name="sb_bucket"]');
+  const pathInput = form.querySelector('input[name="sb_path"]');
+  const filenameInput = form.querySelector('input[name="sb_filename"]');
+  const errorBox = form.querySelector("[data-error]");
+
+  const showError = (msg) => {
+    if (!errorBox) return;
+    errorBox.textContent = msg;
+    errorBox.setAttribute("aria-hidden", "false");
+  };
+  const hideError = () => {
+    if (!errorBox) return;
+    errorBox.textContent = "";
+    errorBox.setAttribute("aria-hidden", "true");
+  };
+
+  const encodePath = (p) =>
+    p
+      .split("/")
+      .filter(Boolean)
+      .map((seg) => encodeURIComponent(seg))
+      .join("/");
+
+  const downloadBlob = (blob, filename) => {
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  };
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideError();
+
+    const publicUrl = (urlInput?.value || "").trim();
+    const bucket = (bucketInput?.value || "").trim();
+    const path = (pathInput?.value || "").trim().replace(/^\/+/, "");
+    const suggestedName = (filenameInput?.value || "").trim();
+
+    let downloadUrl = publicUrl;
+    let fallbackName = suggestedName;
+
+    if (!downloadUrl) {
+      downloadUrl = `${SUPABASE_URL}/storage/v1/object/public/ova/perrito.jpg`;
+    }
+
+    if (downloadUrl === `${SUPABASE_URL}/storage/v1/object/public/ova/perrito.jpg` && !fallbackName) {
+      fallbackName = "perrito.jpg";
+    }
+
+    if (!publicUrl && downloadUrl !== `${SUPABASE_URL}/storage/v1/object/public/ova/perrito.jpg`) {
+      if (!bucket) {
+        showError("Introduce el bucket.");
+        bucketInput?.focus();
+        return;
+      }
+      if (!path) {
+        showError("Introduce la ruta del archivo.");
+        pathInput?.focus();
+        return;
+      }
+      const encoded = encodePath(path);
+      downloadUrl = `${SUPABASE_URL}/storage/v1/object/public/${encodeURIComponent(bucket)}/${encoded}`;
+      if (!fallbackName) {
+        const parts = path.split("/").filter(Boolean);
+        fallbackName = parts[parts.length - 1] || "imagen";
+      }
+    } else if (!fallbackName) {
+      try {
+        const u = new URL(downloadUrl);
+        const parts = u.pathname.split("/").filter(Boolean);
+        fallbackName = parts[parts.length - 1] || "imagen";
+      } catch {
+        fallbackName = "imagen";
+      }
+    }
+
+    const fetchWithHeaders = () =>
+      fetch(downloadUrl, {
+        method: "GET",
+        headers: {
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      });
+
+    try {
+      let res = await fetch(downloadUrl, { method: "GET" });
+      if ((res.status === 401 || res.status === 403) && SUPABASE_PUBLISHABLE_KEY) {
+        res = await fetchWithHeaders();
+      }
+
+      if (!res.ok) {
+        if (res.status === 503) {
+          showError("Servicio no disponible (503). Puede que el proyecto de Supabase esté pausado o haya una incidencia temporal.");
+          return;
+        }
+        showError(`No se pudo descargar (HTTP ${res.status}). Revisa bucket/ruta o si el archivo es público.`);
+        return;
+      }
+
+      const blob = await res.blob();
+      downloadBlob(blob, fallbackName);
+    } catch {
+      showError("Error de red al descargar la imagen.");
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -359,5 +484,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initAuthLinks();
   initCookieBanner();
   initCookieBlockedPage();
+  initSupabaseDownload();
 });
 

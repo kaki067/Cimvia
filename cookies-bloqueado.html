@@ -57,5 +57,28 @@
     <script>
       document.getElementById("year").textContent = new Date().getFullYear();
     </script>
+    <script>
+      (function () {
+        var btn = document.querySelector("[data-cookie-accept]");
+        if (!btn) return;
+        btn.addEventListener("click", function () {
+          try {
+            document.cookie = "cimva_cookie_consent=accepted; Max-Age=" + (60 * 60 * 24 * 180) + "; Path=/; SameSite=Lax";
+          } catch (e) {}
+          try {
+            localStorage.setItem("cimvia_cookie_consent_v1", "accepted");
+          } catch (e) {}
+          try {
+            sessionStorage.setItem("cimvia_cookie_consent_v1", "accepted");
+          } catch (e) {}
+          var back = null;
+          try {
+            back = sessionStorage.getItem("cimvia_return_to_v1");
+            sessionStorage.removeItem("cimvia_return_to_v1");
+          } catch (e) {}
+          window.location.replace(back || "index.html");
+        });
+      })();
+    </script>
   </body>
 </html>

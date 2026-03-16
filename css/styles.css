@@ -438,6 +438,9 @@ main{ padding-bottom: 40px; }
   box-shadow: var(--shadow);
   padding: 22px;
 }
+.form-wide{
+  max-width: 680px;
+}
 .form h1{ margin: 0 0 10px; font-size: 24px; }
 .field{ display: grid; gap: 6px; margin-top: 12px; }
 .field label{ font-weight: 700; font-size: 13px; color: var(--text-soft); }
