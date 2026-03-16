@@ -6,6 +6,27 @@ const CONSENT_COOKIE_NAME = "cimva_cookie_consent";
 const SUPABASE_URL = "https://cshvfrnougpxhlnvddem.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_aPByjxuEr9nwBGo1ol6j4Q_jEyelpFM";
 
+let _supabaseClient = null;
+function getSupabaseClient() {
+  if (_supabaseClient) return _supabaseClient;
+  const lib = window.supabase;
+  if (!lib || typeof lib.createClient !== "function") return null;
+  _supabaseClient = lib.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  return _supabaseClient;
+}
+
+async function getSupabaseSession() {
+  const client = getSupabaseClient();
+  if (!client) return null;
+  try {
+    const { data, error } = await client.auth.getSession();
+    if (error) return null;
+    return data?.session || null;
+  } catch {
+    return null;
+  }
+}
+
 function getSession() {
   try {
     const raw = localStorage.getItem(SESSION_KEY);
@@ -189,7 +210,9 @@ function initLoginForm() {
 
   const emailInput = form.querySelector('input[name="email"]');
   const passInput = form.querySelector('input[name="password"]');
+  const registerBtn = form.querySelector("[data-register]");
   const errorBox = form.querySelector("[data-error]");
+  const submitBtn = form.querySelector('button[type="submit"]');
 
   const showError = (msg) => {
     if (!errorBox) return;
@@ -203,26 +226,94 @@ function initLoginForm() {
     errorBox.setAttribute("aria-hidden", "true");
   };
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    hideError();
-
+  const validate = () => {
     const email = (emailInput?.value || "").trim().toLowerCase();
     const password = passInput?.value || "";
-
     if (!email || !email.includes("@")) {
       showError("Introduce un correo válido.");
       emailInput?.focus();
-      return;
+      return null;
     }
-    if (!password || password.length < 4) {
-      showError("Introduce una contraseña válida.");
+    if (!password || password.length < 6) {
+      showError("La contraseña debe tener al menos 6 caracteres.");
       passInput?.focus();
+      return null;
+    }
+    return { email, password };
+  };
+
+  const setBusy = (busy) => {
+    if (submitBtn) submitBtn.disabled = busy;
+    if (registerBtn) registerBtn.disabled = busy;
+  };
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideError();
+
+    const creds = validate();
+    if (!creds) return;
+
+    const client = getSupabaseClient();
+    if (!client) {
+      setSession(creds.email);
+      redirectTo("panel.html");
       return;
     }
 
-    setSession(email);
-    redirectTo("panel.html");
+    setBusy(true);
+    try {
+      const { data, error } = await client.auth.signInWithPassword({
+        email: creds.email,
+        password: creds.password,
+      });
+      if (error) {
+        showError(error.message);
+        return;
+      }
+      if (data?.session) {
+        redirectTo("panel.html");
+        return;
+      }
+      showError("No se pudo iniciar sesión. Revisa tus credenciales.");
+    } catch {
+      showError("Error al iniciar sesión.");
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  registerBtn?.addEventListener("click", async () => {
+    hideError();
+    const creds = validate();
+    if (!creds) return;
+
+    const client = getSupabaseClient();
+    if (!client) {
+      showError("Registro no disponible sin conexión a Supabase.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const { data, error } = await client.auth.signUp({
+        email: creds.email,
+        password: creds.password,
+      });
+      if (error) {
+        showError(error.message);
+        return;
+      }
+      if (data?.session) {
+        redirectTo("panel.html");
+        return;
+      }
+      showError("Cuenta creada. Revisa tu correo para confirmar el registro.");
+    } catch {
+      showError("Error al crear la cuenta.");
+    } finally {
+      setBusy(false);
+    }
   });
 }
 
@@ -281,32 +372,45 @@ function initContactForm() {
   });
 }
 
-function initProtectedPage() {
+async function initProtectedPage() {
   const requiresAuth = document.body?.getAttribute("data-requires-auth") === "true";
   if (!requiresAuth) return;
-  const session = getSession();
-  if (!session) redirectTo("login.html");
+  const supabaseSession = await getSupabaseSession();
+  const legacySession = getSession();
+  const email = supabaseSession?.user?.email || legacySession?.email || null;
+  if (!email) {
+    redirectTo("login.html");
+    return;
+  }
 
   const emailSlot = document.querySelector("[data-session-email]");
-  if (emailSlot && session?.email) emailSlot.textContent = session.email;
+  if (emailSlot && email) emailSlot.textContent = email;
 
   const logoutBtn = document.querySelector("[data-logout]");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener("click", async () => {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          await client.auth.signOut();
+        } catch {}
+      }
       clearSession();
       redirectTo("index.html");
     });
   }
 }
 
-function initAuthLinks() {
-  const session = getSession();
+async function initAuthLinks() {
+  const supabaseSession = await getSupabaseSession();
+  const legacySession = getSession();
+  const hasSession = Boolean(supabaseSession || legacySession);
   const loginLinks = document.querySelectorAll("[data-auth-link]");
   for (const link of loginLinks) {
     const mode = link.getAttribute("data-auth-link");
     if (mode === "login") {
-      link.setAttribute("href", session ? "panel.html" : "login.html");
-      link.textContent = session ? "Panel" : "Iniciar sesión";
+      link.setAttribute("href", hasSession ? "panel.html" : "login.html");
+      link.textContent = hasSession ? "Panel" : "Iniciar sesión";
     }
   }
 }
@@ -474,14 +578,14 @@ function initSupabaseDownload() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initThemeToggle();
   initCookieGate();
   initSmoothAnchors();
   initLoginForm();
   initContactForm();
-  initProtectedPage();
-  initAuthLinks();
+  await initProtectedPage();
+  await initAuthLinks();
   initCookieBanner();
   initCookieBlockedPage();
   initSupabaseDownload();
