@@ -87,6 +87,33 @@
             </p>
           </div>
         </section>
+
+        <section class="section" data-forum>
+          <div class="container" style="padding:0">
+            <h2>Foro</h2>
+            <p class="lead">Comparte dudas, sugerencias o avisos sobre los paquetes.</p>
+
+            <form class="form form-wide" data-forum-form>
+              <div class="field">
+                <label for="forum_title">Título</label>
+                <input id="forum_title" name="title" type="text" autocomplete="off" placeholder="Ej: Problema al importar" required />
+              </div>
+
+              <div class="field">
+                <label for="forum_content">Mensaje</label>
+                <textarea id="forum_content" name="content" rows="5" placeholder="Escribe tu mensaje..." required></textarea>
+              </div>
+
+              <div class="error" data-forum-error aria-hidden="true" role="alert"></div>
+
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Publicar</button>
+              </div>
+            </form>
+
+            <div class="list" style="margin-top:16px" data-forum-list></div>
+          </div>
+        </section>
       </div>
     </main>
 

@@ -723,6 +723,321 @@ function initOvaDownloads() {
   }
 }
 
+function initForum() {
+  const root = document.querySelector("[data-forum]");
+  if (!root) return;
+
+  const form = root.querySelector("[data-forum-form]");
+  const list = root.querySelector("[data-forum-list]");
+  const errorBox = root.querySelector("[data-forum-error]");
+
+  const showError = (msg) => {
+    if (!errorBox) return;
+    errorBox.textContent = msg;
+    errorBox.setAttribute("aria-hidden", "false");
+  };
+  const hideError = () => {
+    if (!errorBox) return;
+    errorBox.textContent = "";
+    errorBox.setAttribute("aria-hidden", "true");
+  };
+
+  const client = getSupabaseClient();
+  if (!client) {
+    showError("No se pudo cargar Supabase.");
+    return;
+  }
+
+  const shortId = (id) => {
+    if (!id || typeof id !== "string") return "Usuario";
+    return `Usuario ${id.slice(0, 6)}`;
+  };
+
+  const renderComments = (container, comments) => {
+    container.innerHTML = "";
+    if (!comments?.length) {
+      const empty = document.createElement("p");
+      empty.className = "hint";
+      empty.textContent = "Sin comentarios todavía.";
+      container.appendChild(empty);
+      return;
+    }
+
+    for (const c of comments) {
+      const item = document.createElement("div");
+      item.className = "list-item";
+
+      const dot = document.createElement("div");
+      dot.className = "dot";
+
+      const content = document.createElement("div");
+
+      const body = document.createElement("p");
+      body.textContent = c.content || "";
+
+      const meta = document.createElement("p");
+      meta.className = "hint";
+      const when = c.created_at ? new Date(c.created_at).toLocaleString("es-ES") : "";
+      const who = shortId(c.user_id);
+      meta.textContent = when ? `${who} · ${when}` : who;
+
+      content.appendChild(body);
+      content.appendChild(meta);
+      item.appendChild(dot);
+      item.appendChild(content);
+      container.appendChild(item);
+    }
+  };
+
+  const renderPosts = (posts, session) => {
+    if (!list) return;
+    list.innerHTML = "";
+    if (!posts?.length) {
+      const empty = document.createElement("p");
+      empty.className = "hint";
+      empty.textContent = "Todavía no hay mensajes. Sé el primero en publicar.";
+      list.appendChild(empty);
+      return;
+    }
+
+    for (const post of posts) {
+      const item = document.createElement("div");
+      item.className = "list-item";
+
+      const dot = document.createElement("div");
+      dot.className = "dot";
+
+      const content = document.createElement("div");
+
+      const title = document.createElement("h3");
+      title.textContent = post.title || "Post";
+
+      const body = document.createElement("p");
+      body.textContent = post.content || "";
+
+      const meta = document.createElement("p");
+      meta.className = "hint";
+      const when = post.created_at ? new Date(post.created_at).toLocaleString("es-ES") : "";
+      const who = shortId(post.user_id);
+      meta.textContent = when ? `${who} · ${when}` : who;
+
+      const actions = document.createElement("div");
+      actions.className = "hero-actions";
+      actions.style.marginTop = "10px";
+
+      const toggleBtn = document.createElement("button");
+      toggleBtn.type = "button";
+      toggleBtn.className = "btn";
+      toggleBtn.textContent = "Ver comentarios";
+
+      const commentsWrap = document.createElement("div");
+      commentsWrap.style.display = "none";
+      commentsWrap.style.marginTop = "12px";
+
+      const commentsList = document.createElement("div");
+      commentsWrap.appendChild(commentsList);
+
+      const commentForm = document.createElement("form");
+      commentForm.style.marginTop = "12px";
+
+      const commentField = document.createElement("div");
+      commentField.className = "field";
+
+      const commentLabel = document.createElement("label");
+      commentLabel.textContent = "Comentario";
+
+      const commentArea = document.createElement("textarea");
+      commentArea.rows = 3;
+      commentArea.placeholder = "Escribe un comentario...";
+      commentArea.required = true;
+
+      commentField.appendChild(commentLabel);
+      commentField.appendChild(commentArea);
+
+      const commentActions = document.createElement("div");
+      commentActions.className = "form-actions";
+
+      const sendBtn = document.createElement("button");
+      sendBtn.type = "submit";
+      sendBtn.className = "btn btn-primary";
+      sendBtn.textContent = "Enviar";
+
+      commentActions.appendChild(sendBtn);
+      commentForm.appendChild(commentField);
+      commentForm.appendChild(commentActions);
+
+      if (!session) {
+        commentArea.disabled = true;
+        sendBtn.disabled = true;
+        commentArea.placeholder = "Inicia sesión para comentar.";
+      }
+
+      commentsWrap.appendChild(commentForm);
+
+      toggleBtn.addEventListener("click", async () => {
+        hideError();
+        const isOpen = commentsWrap.style.display !== "none";
+        if (isOpen) {
+          commentsWrap.style.display = "none";
+          toggleBtn.textContent = "Ver comentarios";
+          return;
+        }
+        toggleBtn.disabled = true;
+        try {
+          const { data, error } = await client
+            .from("comments")
+            .select("id,created_at,content,user_id")
+            .eq("post_id", post.id)
+            .order("created_at", { ascending: true })
+            .limit(100);
+
+          if (error) {
+            showError(error.message || "No se pudieron cargar los comentarios.");
+            return;
+          }
+
+          renderComments(commentsList, data || []);
+          commentsWrap.style.display = "block";
+          toggleBtn.textContent = "Ocultar comentarios";
+        } catch {
+          showError("Error al cargar comentarios.");
+        } finally {
+          toggleBtn.disabled = false;
+        }
+      });
+
+      commentForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        hideError();
+        if (!session) {
+          showError("Inicia sesión para comentar.");
+          redirectTo("login.html");
+          return;
+        }
+        const contentValue = (commentArea.value || "").trim();
+        if (!contentValue) return;
+
+        sendBtn.disabled = true;
+        try {
+          const payload = {
+            post_id: post.id,
+            user_id: session.user.id,
+            content: contentValue,
+          };
+          const { error } = await client.from("comments").insert(payload);
+          if (error) {
+            showError(error.message || "No se pudo enviar el comentario.");
+            return;
+          }
+          commentArea.value = "";
+          toggleBtn.click();
+          toggleBtn.click();
+        } catch {
+          showError("Error al enviar el comentario.");
+        } finally {
+          sendBtn.disabled = false;
+        }
+      });
+
+      actions.appendChild(toggleBtn);
+
+      content.appendChild(title);
+      content.appendChild(body);
+      content.appendChild(meta);
+      content.appendChild(actions);
+      content.appendChild(commentsWrap);
+
+      item.appendChild(dot);
+      item.appendChild(content);
+      list.appendChild(item);
+    }
+  };
+
+  const loadPosts = async () => {
+    hideError();
+    try {
+      const { data: sessionData } = await client.auth.getSession();
+      const session = sessionData?.session || null;
+      const { data, error } = await client
+        .from("posts")
+        .select("id,created_at,title,content,user_id")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) {
+        const msg = error.message || "No se pudieron cargar los mensajes.";
+        showError(msg);
+        return;
+      }
+
+      renderPosts(data || [], session);
+    } catch {
+      showError("Error al cargar el foro.");
+    }
+  };
+
+  loadPosts();
+
+  if (!form) return;
+  const titleInput = form.querySelector('input[name="title"]');
+  const bodyInput = form.querySelector('textarea[name="content"]');
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  const setBusy = (busy) => {
+    if (submitBtn) submitBtn.disabled = busy;
+  };
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideError();
+
+    const title = (titleInput?.value || "").trim();
+    const body = (bodyInput?.value || "").trim();
+    if (!title) {
+      showError("Escribe un título.");
+      titleInput?.focus();
+      return;
+    }
+    if (!body) {
+      showError("Escribe un mensaje.");
+      bodyInput?.focus();
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+      if (sessionError || !sessionData?.session) {
+        showError("Inicia sesión para publicar.");
+        redirectTo("login.html");
+        return;
+      }
+
+      const user = sessionData.session.user;
+      const payload = {
+        user_id: user.id,
+        title,
+        content: body,
+      };
+
+      const { error } = await client.from("posts").insert(payload);
+      if (error) {
+        const msg = error.message || "No se pudo publicar.";
+        showError(msg);
+        return;
+      }
+
+      if (titleInput) titleInput.value = "";
+      if (bodyInput) bodyInput.value = "";
+      await loadPosts();
+    } catch {
+      showError("Error al publicar.");
+    } finally {
+      setBusy(false);
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   initThemeToggle();
   initCookieGate();
@@ -736,5 +1051,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   initCookieBlockedPage();
   initSupabaseDownload();
   initOvaDownloads();
+  initForum();
 });
 
