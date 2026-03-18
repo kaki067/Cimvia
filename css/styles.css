@@ -465,6 +465,15 @@ main{ padding-bottom: 40px; }
   flex-wrap: wrap;
   margin-top: 14px;
 }
+.form-separator{
+  height: 1px;
+  background: var(--border);
+  margin-top: 16px;
+}
+.form-hint-center{
+  text-align: center;
+  margin-top: 12px;
+}
 .hint{ color: var(--text-subtle); font-size: 13px; }
 .error{
   margin-top: 12px;

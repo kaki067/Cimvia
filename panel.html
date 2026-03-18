@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Panel | Cimva</title>
+    <title>Paquetes | Cimva</title>
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body data-requires-auth="true">
@@ -16,7 +16,7 @@
           <span class="brand-badge" aria-hidden="true"></span>
           <span>
             Cimva
-            <small>Panel</small>
+            <small>Paquetes</small>
           </span>
         </a>
         <nav class="nav" aria-label="Navegación principal">
@@ -38,62 +38,53 @@
 
         <section class="section">
           <div class="container" style="padding:0">
-            <h2>Accesos rápidos</h2>
-            <p class="lead">Secciones del sitio con navegación ya conectada.</p>
+            <h2>Paquetes</h2>
+            <p class="lead">OVAs listas para descargar e importar en Proxmox.</p>
 
             <div class="cards">
               <article class="card">
-                <h3>Servicios</h3>
-                <p>Revisa todas las ventajas y servicios ofrecidos.</p>
+                <h3>Debian Servidor de Seguridad y Red</h3>
+                <p>Máquina base orientada a servicios de red, seguridad y administración.</p>
                 <div class="hero-actions" style="margin-top:12px">
-                  <a class="btn btn-primary" href="servicios.html">Abrir</a>
+                  <a
+                    class="btn btn-primary"
+                    href="https://cshvfrnougpxhlnvddem.supabase.co/storage/v1/object/public/ova/Debian%20Servidor%20de%20Seguridad%20y%20Red.rar"
+                    download
+                    >Descargar</a
+                  >
                 </div>
               </article>
+
               <article class="card">
-                <h3>Sobre nosotros</h3>
-                <p>Información de la empresa y enfoque de trabajo.</p>
+                <h3>Debian Servidor Web</h3>
+                <p>Imagen preparada para desplegar servicios web y pruebas de hosting en local.</p>
                 <div class="hero-actions" style="margin-top:12px">
-                  <a class="btn btn-primary" href="sobre.html">Abrir</a>
+                  <a
+                    class="btn btn-primary"
+                    href="https://cshvfrnougpxhlnvddem.supabase.co/storage/v1/object/public/ova/Debian%20Servidor%20Web.rar"
+                    download
+                    >Descargar</a
+                  >
                 </div>
               </article>
+
               <article class="card">
-                <h3>Contacto</h3>
-                <p>Envía una solicitud o pide una demo.</p>
+                <h3>Ubuntu Servidor de Base de Datos</h3>
+                <p>Imagen base para bases de datos y servicios backend, lista para importar.</p>
                 <div class="hero-actions" style="margin-top:12px">
-                  <a class="btn btn-primary" href="contacto.html">Abrir</a>
+                  <a
+                    class="btn btn-primary"
+                    href="https://cshvfrnougpxhlnvddem.supabase.co/storage/v1/object/public/ova/Ubuntu%20Servidor%20de%20Base%20de%20Datos.rar"
+                    download
+                    >Descargar</a
+                  >
                 </div>
               </article>
             </div>
-          </div>
-        </section>
 
-        <section class="section">
-          <div class="container" style="padding:0">
-            <h2>Descargar imagen (Supabase)</h2>
-            <p class="lead">Descarga directa de la imagen almacenada en Supabase.</p>
-
-            <form class="form form-wide" data-supabase-download>
-              <input
-                name="sb_url"
-                type="hidden"
-                value="https://cshvfrnougpxhlnvddem.supabase.co/storage/v1/object/public/ova/perrito.jpg"
-              />
-              <input name="sb_bucket" type="hidden" value="ova" />
-              <input name="sb_path" type="hidden" value="perrito.jpg" />
-              <input name="sb_filename" type="hidden" value="perrito.jpg" />
-
-              <div class="error" data-error aria-hidden="true" role="alert"></div>
-
-              <div class="form-actions">
-                <button class="btn btn-primary" type="submit">Descargar</button>
-              </div>
-
-              <p class="hint">
-                Si el servicio no está disponible, revisa el estado del proyecto en Supabase.
-                <br />
-                <a href="cookies.html">Ver política de cookies</a>
-              </p>
-            </form>
+            <p class="hint" style="margin-top:14px">
+              Si el servidor devuelve “Service Unavailable”, revisa que el proyecto de Supabase esté activo.
+            </p>
           </div>
         </section>
       </div>

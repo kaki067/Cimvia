@@ -210,7 +210,6 @@ function initLoginForm() {
 
   const emailInput = form.querySelector('input[name="email"]');
   const passInput = form.querySelector('input[name="password"]');
-  const registerBtn = form.querySelector("[data-register]");
   const errorBox = form.querySelector("[data-error]");
   const submitBtn = form.querySelector('button[type="submit"]');
 
@@ -244,7 +243,6 @@ function initLoginForm() {
 
   const setBusy = (busy) => {
     if (submitBtn) submitBtn.disabled = busy;
-    if (registerBtn) registerBtn.disabled = busy;
   };
 
   form.addEventListener("submit", async (e) => {
@@ -268,7 +266,13 @@ function initLoginForm() {
         password: creds.password,
       });
       if (error) {
-        showError(error.message);
+        const msg = error?.message || "Error al iniciar sesión.";
+        const is503 = error?.status === 503 || /service unavailable/i.test(msg);
+        showError(
+          is503
+            ? "Servicio no disponible (Supabase). Revisa que el proyecto esté activo y vuelve a intentarlo."
+            : msg
+        );
         return;
       }
       if (data?.session) {
@@ -282,9 +286,53 @@ function initLoginForm() {
       setBusy(false);
     }
   });
+}
 
-  registerBtn?.addEventListener("click", async () => {
+function initRegisterForm() {
+  const form = document.querySelector("[data-register-form]");
+  if (!form) return;
+
+  const emailInput = form.querySelector('input[name="email"]');
+  const passInput = form.querySelector('input[name="password"]');
+  const errorBox = form.querySelector("[data-error]");
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  const showError = (msg) => {
+    if (!errorBox) return;
+    errorBox.textContent = msg;
+    errorBox.setAttribute("aria-hidden", "false");
+  };
+
+  const hideError = () => {
+    if (!errorBox) return;
+    errorBox.textContent = "";
+    errorBox.setAttribute("aria-hidden", "true");
+  };
+
+  const validate = () => {
+    const email = (emailInput?.value || "").trim().toLowerCase();
+    const password = passInput?.value || "";
+    if (!email || !email.includes("@")) {
+      showError("Introduce un correo válido.");
+      emailInput?.focus();
+      return null;
+    }
+    if (!password || password.length < 6) {
+      showError("La contraseña debe tener al menos 6 caracteres.");
+      passInput?.focus();
+      return null;
+    }
+    return { email, password };
+  };
+
+  const setBusy = (busy) => {
+    if (submitBtn) submitBtn.disabled = busy;
+  };
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
     hideError();
+
     const creds = validate();
     if (!creds) return;
 
@@ -301,7 +349,13 @@ function initLoginForm() {
         password: creds.password,
       });
       if (error) {
-        showError(error.message);
+        const msg = error?.message || "Error al crear la cuenta.";
+        const is503 = error?.status === 503 || /service unavailable/i.test(msg);
+        showError(
+          is503
+            ? "Servicio no disponible (Supabase). Revisa que el proyecto esté activo y vuelve a intentarlo."
+            : msg
+        );
         return;
       }
       if (data?.session) {
@@ -410,7 +464,7 @@ async function initAuthLinks() {
     const mode = link.getAttribute("data-auth-link");
     if (mode === "login") {
       link.setAttribute("href", hasSession ? "panel.html" : "login.html");
-      link.textContent = hasSession ? "Panel" : "Iniciar sesión";
+      link.textContent = hasSession ? "Paquetes" : "Iniciar sesión";
     }
   }
 }
@@ -578,16 +632,109 @@ function initSupabaseDownload() {
   });
 }
 
+function initOvaDownloads() {
+  const buttons = document.querySelectorAll("[data-ova-download]");
+  if (!buttons.length) return;
+
+  const errorBox = document.querySelector("[data-ova-error]");
+  const showError = (msg) => {
+    if (!errorBox) return;
+    errorBox.textContent = msg;
+    errorBox.setAttribute("aria-hidden", "false");
+  };
+  const hideError = () => {
+    if (!errorBox) return;
+    errorBox.textContent = "";
+    errorBox.setAttribute("aria-hidden", "true");
+  };
+
+  const encodeObjectPath = (p) =>
+    p
+      .split("/")
+      .filter((seg) => seg.length > 0)
+      .map((seg) => encodeURIComponent(seg))
+      .join("/");
+
+  const buildPathCandidates = (raw) => {
+    const candidates = [];
+    const push = (v) => {
+      if (!v) return;
+      if (!candidates.includes(v)) candidates.push(v);
+    };
+    push(raw);
+    try {
+      if (/%[0-9a-f]{2}/i.test(raw)) push(decodeURIComponent(raw));
+    } catch {}
+    if (raw.includes(" ")) push(encodeObjectPath(raw));
+    return candidates;
+  };
+
+  for (const btn of buttons) {
+    btn.addEventListener("click", async () => {
+      hideError();
+      const bucket = btn.getAttribute("data-bucket") || "ova";
+      const path = btn.getAttribute("data-path") || "";
+      if (!path) {
+        showError("No se encontró la ruta del archivo.");
+        return;
+      }
+
+      const client = getSupabaseClient();
+      if (!client) {
+        showError("No se pudo cargar Supabase. Revisa tu conexión.");
+        return;
+      }
+
+      btn.disabled = true;
+      try {
+        const { data: sessionData, error: sessionError } = await client.auth.getSession();
+        if (sessionError || !sessionData?.session) {
+          showError("Inicia sesión para descargar los paquetes.");
+          redirectTo("login.html");
+          return;
+        }
+
+        const candidates = buildPathCandidates(path);
+        let signedUrl = null;
+        let lastError = null;
+        for (const candidate of candidates) {
+          const { data, error } = await client.storage.from(bucket).createSignedUrl(candidate, 600);
+          if (!error && data?.signedUrl) {
+            signedUrl = data.signedUrl;
+            break;
+          }
+          lastError = error || lastError;
+        }
+
+        if (!signedUrl) {
+          const msg = lastError?.message || "No se pudo generar el enlace de descarga.";
+          const status = lastError?.status ? ` (HTTP ${lastError.status})` : "";
+          showError(`${msg}${status} Revisa permisos de Storage y nombre del archivo.`);
+          return;
+        }
+
+        window.location.href = signedUrl;
+      } catch {
+        showError("Error al preparar la descarga.");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   initThemeToggle();
   initCookieGate();
   initSmoothAnchors();
   initLoginForm();
+  initRegisterForm();
   initContactForm();
   await initProtectedPage();
   await initAuthLinks();
   initCookieBanner();
   initCookieBlockedPage();
   initSupabaseDownload();
+  initOvaDownloads();
 });
 
