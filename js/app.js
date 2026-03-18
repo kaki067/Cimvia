@@ -789,7 +789,7 @@ function initForum() {
     }
   };
 
-  const renderPosts = (posts, session) => {
+  const renderPosts = (posts, session, commentsByPost) => {
     if (!list) return;
     list.innerHTML = "";
     if (!posts?.length) {
@@ -825,20 +825,21 @@ function initForum() {
       actions.className = "hero-actions";
       actions.style.marginTop = "10px";
 
-      const toggleBtn = document.createElement("button");
-      toggleBtn.type = "button";
-      toggleBtn.className = "btn";
-      toggleBtn.textContent = "Ver comentarios";
+      const replyBtn = document.createElement("button");
+      replyBtn.type = "button";
+      replyBtn.className = "btn";
+      replyBtn.textContent = "Responder";
 
       const commentsWrap = document.createElement("div");
-      commentsWrap.style.display = "none";
       commentsWrap.style.marginTop = "12px";
 
       const commentsList = document.createElement("div");
+      renderComments(commentsList, commentsByPost?.[post.id] || []);
       commentsWrap.appendChild(commentsList);
 
       const commentForm = document.createElement("form");
       commentForm.style.marginTop = "12px";
+      commentForm.style.display = "none";
 
       const commentField = document.createElement("div");
       commentField.className = "field";
@@ -874,36 +875,11 @@ function initForum() {
 
       commentsWrap.appendChild(commentForm);
 
-      toggleBtn.addEventListener("click", async () => {
+      replyBtn.addEventListener("click", () => {
         hideError();
-        const isOpen = commentsWrap.style.display !== "none";
-        if (isOpen) {
-          commentsWrap.style.display = "none";
-          toggleBtn.textContent = "Ver comentarios";
-          return;
-        }
-        toggleBtn.disabled = true;
-        try {
-          const { data, error } = await client
-            .from("comments")
-            .select("id,created_at,content,user_id")
-            .eq("post_id", post.id)
-            .order("created_at", { ascending: true })
-            .limit(100);
-
-          if (error) {
-            showError(error.message || "No se pudieron cargar los comentarios.");
-            return;
-          }
-
-          renderComments(commentsList, data || []);
-          commentsWrap.style.display = "block";
-          toggleBtn.textContent = "Ocultar comentarios";
-        } catch {
-          showError("Error al cargar comentarios.");
-        } finally {
-          toggleBtn.disabled = false;
-        }
+        const isOpen = commentForm.style.display !== "none";
+        commentForm.style.display = isOpen ? "none" : "block";
+        if (!isOpen) commentArea.focus();
       });
 
       commentForm.addEventListener("submit", async (e) => {
@@ -930,8 +906,16 @@ function initForum() {
             return;
           }
           commentArea.value = "";
-          toggleBtn.click();
-          toggleBtn.click();
+          commentForm.style.display = "none";
+          const { data, error: reloadError } = await client
+            .from("comments")
+            .select("id,created_at,content,user_id,post_id")
+            .eq("post_id", post.id)
+            .order("created_at", { ascending: true })
+            .limit(100);
+          if (!reloadError) {
+            renderComments(commentsList, data || []);
+          }
         } catch {
           showError("Error al enviar el comentario.");
         } finally {
@@ -939,7 +923,7 @@ function initForum() {
         }
       });
 
-      actions.appendChild(toggleBtn);
+      actions.appendChild(replyBtn);
 
       content.appendChild(title);
       content.appendChild(body);
@@ -970,7 +954,28 @@ function initForum() {
         return;
       }
 
-      renderPosts(data || [], session);
+      const posts = data || [];
+      const postIds = posts.map((p) => p.id).filter(Boolean);
+      const commentsByPost = {};
+
+      if (postIds.length) {
+        const { data: comments, error: commentsError } = await client
+          .from("comments")
+          .select("id,created_at,content,user_id,post_id")
+          .in("post_id", postIds)
+          .order("created_at", { ascending: true })
+          .limit(500);
+
+        if (!commentsError && comments) {
+          for (const c of comments) {
+            if (!c?.post_id) continue;
+            if (!commentsByPost[c.post_id]) commentsByPost[c.post_id] = [];
+            commentsByPost[c.post_id].push(c);
+          }
+        }
+      }
+
+      renderPosts(posts, session, commentsByPost);
     } catch {
       showError("Error al cargar el foro.");
     }
